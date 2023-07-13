@@ -11,12 +11,12 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUserById = (req, res) => {
-  const userId = req.user._id;
+  const { userId } = req.params;
 
   User.findById(userId)
     .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
+      if (err.name === 'CastError') {
         return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
       }
       if (err.name === 'ValidationError') {
