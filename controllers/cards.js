@@ -15,8 +15,22 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  const { id } = req.params.id;
-  Card.findByIdAndRemove(id)
+  const { cardId } = req.params;
+  Card.findByIdAndRemove(cardId)
+    .then((card) => res.status(201).send(card))
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
+
+module.exports.likeCard = (req, res) => {
+  const { cardId } = req.params;
+  Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+    .then((card) => res.status(201).send(card))
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
+
+module.exports.unlikeCard = (req, res) => {
+  const { cardId } = req.params;
+  Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((card) => res.status(201).send(card))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
