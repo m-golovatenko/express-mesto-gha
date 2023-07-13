@@ -28,29 +28,29 @@ module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findByIdAndRemove(cardId)
-    .then((card) => {
-      if (!card) {
+    .then((card) => res.status(SUCCESS_CODE).send(card))
+    .catch((err) => {
+      if (err.name === 'CastError') {
         return res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
       }
-      return res.status(SUCCESS_CODE).send(card);
-    })
-    .catch(() => res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка' }));
+      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+    });
 };
 
 module.exports.likeCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, { new: true })
-    .then((card) => {
-      if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Передан несуществующий _id карточки.' });
-      }
-      return res.status(SUCCESS_CODE).send(card);
-    })
+    .then((card) => res.status(SUCCESS_CODE).send(card))
     .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
+      }
+
       if (err.name === 'ValidationError') {
         return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные для постановки лайка.' });
       }
+
       return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
@@ -59,13 +59,11 @@ module.exports.unlikeCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, { new: true })
-    .then((card) => {
-      if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Передан несуществующий _id карточки.' });
-      }
-      return res.status(SUCCESS_CODE).send(card);
-    })
+    .then((card) => res.status(SUCCESS_CODE).send(card))
     .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
+      }
       if (err.name === 'ValidationError') {
         return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные для снятия лайка.' });
       }

@@ -14,13 +14,13 @@ module.exports.getUserById = (req, res) => {
   const userId = req.user._id;
 
   User.findById(userId)
-    .then((user) => {
-      if (!user) {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь по указанному _id не найден. ' });
+    .then((user) => res.status(SUCCESS_CODE).send(user))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
       }
-      return res.status(SUCCESS_CODE).send(user);
-    })
-    .catch((err) => res.status(SERVER_ERROR_CODE).send({ message: err.message }));
+      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+    });
 };
 
 module.exports.createUser = (req, res) => {
@@ -41,13 +41,11 @@ module.exports.changeProfile = (req, res) => {
   const userId = req.user._id;
 
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
-    .then((user) => {
-      if (!user) {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден. ' });
-      }
-      return res.status(SUCCESS_CODE).send(user);
-    })
+    .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
+      }
       if (err.name === 'ValidationError') {
         return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при изменении данных пользователя.' });
       }
@@ -60,16 +58,16 @@ module.exports.changeAvatar = (req, res) => {
   const userId = req.user._id;
 
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
-    .then((user) => {
-      if (!user) {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден. ' });
-      }
-      return res.status(SUCCESS_CODE).send(user);
-    })
+    .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
+      }
+
       if (err.name === 'ValidationError') {
         return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при изменении аватара пользователя.' });
       }
+
       return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
