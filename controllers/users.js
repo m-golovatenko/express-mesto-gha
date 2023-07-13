@@ -48,7 +48,7 @@ module.exports.changeProfile = (req, res) => {
       return res.status(SUCCESS_CODE).send(user);
     })
     .catch((err) => {
-      if (err.name === 'WrongData') {
+      if (err.name === 'ValidationError') {
         return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при изменении данных пользователя.' });
       }
       return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
@@ -67,7 +67,7 @@ module.exports.changeAvatar = (req, res) => {
       return res.status(SUCCESS_CODE).send(user);
     })
     .catch((err) => {
-      if (err.name === 'WrongData') {
+      if (err.name === 'ValidationError') {
         return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при изменении аватара пользователя.' });
       }
       return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
