@@ -30,7 +30,7 @@ module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(cardId)
     .then((card) => res.status(SUCCESS_CODE).send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'DocumentNotFoundError') {
         return res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
       }
       return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
@@ -43,7 +43,7 @@ module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((card) => res.status(SUCCESS_CODE).send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'DocumentNotFoundError') {
         return res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
       }
 
@@ -61,7 +61,7 @@ module.exports.unlikeCard = (req, res) => {
   Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((card) => res.status(SUCCESS_CODE).send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'DocumentNotFoundError') {
         return res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
       }
       if (err.name === 'ValidationError') {

@@ -16,8 +16,11 @@ module.exports.getUserById = (req, res) => {
   User.findById(userId)
     .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'DocumentNotFoundError') {
         return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
+      }
+      if (err.name === 'ValidationError') {
+        return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       }
       return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
@@ -29,7 +32,7 @@ module.exports.createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.status(SUCCESS_CREATE_CODE).send(user))
     .catch((err) => {
-      if (err.name === 'WrongData') {
+      if (err.name === 'ValidationError') {
         return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       }
       return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
@@ -43,7 +46,7 @@ module.exports.changeProfile = (req, res) => {
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
     .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'DocumentNotFoundError') {
         return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
       }
       if (err.name === 'ValidationError') {
@@ -60,7 +63,7 @@ module.exports.changeAvatar = (req, res) => {
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'DocumentNotFoundError') {
         return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
       }
 
