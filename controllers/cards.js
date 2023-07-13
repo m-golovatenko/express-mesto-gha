@@ -6,7 +6,7 @@ const {
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(SUCCESS_CODE).res.send(cards))
+    .then((cards) => res.status(SUCCESS_CODE).send(cards))
     .catch(() => res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка' }));
 };
 
@@ -16,7 +16,12 @@ module.exports.createCard = (req, res) => {
 
   Card.create({ name, link, owner })
     .then((card) => res.status(SUCCESS_CREATE_CODE).send(card))
-    .catch(() => res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка' }));
+    .catch((err) => {
+      if (err.name === 'WrongData') {
+        return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при создании карточки.' });
+      }
+      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+    });
 };
 
 module.exports.deleteCard = (req, res) => {
@@ -42,7 +47,12 @@ module.exports.likeCard = (req, res) => {
       }
       return res.status(SUCCESS_CODE).send(card);
     })
-    .catch(() => res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка' }));
+    .catch((err) => {
+      if (err.name === 'WrongData') {
+        return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные для постановки лайка.' });
+      }
+      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+    });
 };
 
 module.exports.unlikeCard = (req, res) => {
@@ -55,5 +65,10 @@ module.exports.unlikeCard = (req, res) => {
       }
       return res.status(SUCCESS_CODE).send(card);
     })
-    .catch(() => res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка' }));
+    .catch((err) => {
+      if (err.name === 'WrongData') {
+        return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные для снятия лайка.' });
+      }
+      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+    });
 };
