@@ -18,9 +18,10 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(SUCCESS_CREATE_CODE).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при создании карточки.' });
+        res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при создании карточки.' });
+        return;
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+      res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
 
@@ -28,15 +29,19 @@ module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findByIdAndRemove(cardId)
-    .then((card) => res.status(SUCCESS_CODE).send(card))
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
+        return;
+      }
+      res.status(SUCCESS_CODE).send(card);
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные карточки.' });
+        res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные карточки.' });
+        return;
       }
-      if (err.name === 'DocumentNotFoundError') {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
-      }
-      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+      res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
 
@@ -44,17 +49,19 @@ module.exports.likeCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, { new: true })
-    .then((card) => res.status(SUCCESS_CODE).send(card))
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
+        return;
+      }
+      res.status(SUCCESS_CODE).send(card);
+    })
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
-      }
-
       if (err.name === 'CastError') {
-        return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные для постановки лайка.' });
+        res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные для постановки лайка.' });
+        return;
       }
-
-      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+      res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
 
@@ -62,14 +69,18 @@ module.exports.unlikeCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, { new: true })
-    .then((card) => res.status(SUCCESS_CODE).send(card))
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
+        return;
+      }
+      res.status(SUCCESS_CODE).send(card);
+    })
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
-      }
       if (err.name === 'CastError') {
-        return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные для снятия лайка.' });
+        res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные для снятия лайка.' });
+        return;
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+      res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };

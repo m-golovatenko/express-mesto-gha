@@ -18,13 +18,15 @@ module.exports.getUserById = (req, res) => {
       if (!user) {
         res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
         return;
-      }res.status(SUCCESS_CODE).send(user);
+      }
+      res.status(SUCCESS_CODE).send(user);
     })
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при поиске пользователя.' });
+      if (err.name === 'CastError') {
+        res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при поиске пользователя.' });
+        return;
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+      res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
 
@@ -35,9 +37,10 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.status(SUCCESS_CREATE_CODE).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+        res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+        return;
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+      res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
 
@@ -49,12 +52,14 @@ module.exports.changeProfile = (req, res) => {
     .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
+        res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
+        return;
       }
       if (err.name === 'ValidationError') {
-        return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при изменении данных пользователя.' });
+        res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при изменении данных пользователя.' });
+        return;
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+      res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
 
@@ -66,13 +71,15 @@ module.exports.changeAvatar = (req, res) => {
     .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
+        res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
+        return;
       }
 
       if (err.name === 'ValidationError') {
-        return res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при изменении аватара пользователя.' });
+        res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при изменении аватара пользователя.' });
+        return;
       }
 
-      return res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+      res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
