@@ -29,14 +29,12 @@ module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findByIdAndRemove(cardId)
-    .then((card) => {
-      if (!card) {
-        res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
-        return;
-      }
-      res.status(SUCCESS_CODE).send(card);
-    })
+    .orFail(new Error('NotValidId'))
+    .then((card) => res.status(SUCCESS_CODE).send(card))
     .catch((err) => {
+      if (err.name === 'NotValidId') {
+        res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
+      }
       if (err.name === 'CastError') {
         res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные карточки.' });
         return;
@@ -49,14 +47,11 @@ module.exports.likeCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, { new: true })
-    .then((card) => {
-      if (!card) {
-        res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
-        return;
-      }
-      res.status(SUCCESS_CODE).send(card);
-    })
+    .then((card) => res.status(SUCCESS_CODE).send(card))
     .catch((err) => {
+      if (err.name === 'NotValidId') {
+        res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
+      }
       if (err.name === 'CastError') {
         res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные для постановки лайка.' });
         return;
@@ -69,14 +64,11 @@ module.exports.unlikeCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, { new: true })
-    .then((card) => {
-      if (!card) {
-        res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
-        return;
-      }
-      res.status(SUCCESS_CODE).send(card);
-    })
+    .then((card) => res.status(SUCCESS_CODE).send(card))
     .catch((err) => {
+      if (err.name === 'NotValidId') {
+        res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
+      }
       if (err.name === 'CastError') {
         res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные для снятия лайка.' });
         return;

@@ -14,17 +14,14 @@ module.exports.getUserById = (req, res) => {
   const { userId } = req.params;
 
   User.findById(userId)
-    .then((user) => {
-      if (!user) {
-        res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
-        return;
-      }
-      res.status(SUCCESS_CODE).send(user);
-    })
+    .orFail(new Error('NotValidId'))
+    .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
+      if (err.name === 'NotValidId') {
+        res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
+      }
       if (err.name === 'CastError') {
         res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при поиске пользователя.' });
-        return;
       }
       res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
@@ -49,6 +46,7 @@ module.exports.changeProfile = (req, res) => {
   const userId = req.user._id;
 
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
+    .orFail()
     .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
@@ -68,6 +66,7 @@ module.exports.changeAvatar = (req, res) => {
   const userId = req.user._id;
 
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
+    .orFail()
     .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {

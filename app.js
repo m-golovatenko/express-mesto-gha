@@ -1,9 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { NOT_FOUND_CODE } = require('./utils/constants');
-
-const { PORT = 3000 } = process.env;
+const helmet = require('helmet');
+const { NOT_FOUND_CODE, PORT, DB_URL } = require('./utils/constants');
 
 const app = express();
 
@@ -14,7 +13,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
 app.use(bodyParser.json());
+app.use(helmet());
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
@@ -23,7 +24,7 @@ app.use('*', (req, res) => {
 });
 
 mongoose
-  .connect('mongodb://127.0.0.1:27017/mestodb')
+  .connect(DB_URL)
   .then(() => {
     console.log('БД подключена');
   }).catch(() => {
