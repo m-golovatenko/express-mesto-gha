@@ -15,13 +15,18 @@ module.exports.getUserById = (req, res) => {
 
   User.findById(userId)
     .orFail(new Error('NotValidId'))
-    .then((user) => res.status(SUCCESS_CODE).send(user))
-    .catch((err) => {
-      if (err.name === 'NotValidId') {
+    .then((user) => {
+      if (!user) {
         res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
-      } else if (err.name === 'CastError') {
+        return;
+      }
+      res.status(SUCCESS_CODE).send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
         res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при поиске пользователя.' });
-      } else res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+      }
+      res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
 

@@ -30,13 +30,17 @@ module.exports.deleteCard = (req, res) => {
 
   Card.findByIdAndRemove(cardId)
     .orFail(new Error('NotValidId'))
-    .then((card) => res.status(SUCCESS_CODE).send(card))
-    .catch((err) => {
-      if (err.name === 'NotValidId') {
+    .then((card) => {
+      if (!card) {
         res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
-      } else if (err.name === 'CastError') {
+        return;
+      }
+      res.status(SUCCESS_CODE).send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
         res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные карточки.' });
-      } else res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+      } res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
 
@@ -44,13 +48,18 @@ module.exports.likeCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, { new: true })
-    .then((card) => res.status(SUCCESS_CODE).send(card))
-    .catch((err) => {
-      if (err.name === 'NotValidId') {
+    .then((card) => {
+      if (!card) {
         res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
-      } else if (err.name === 'CastError') {
+        return;
+      }
+      res.status(SUCCESS_CODE).send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
         res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные для постановки лайка.' });
-      } else res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+      }
+      res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
 
@@ -58,12 +67,16 @@ module.exports.unlikeCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, { new: true })
-    .then((card) => res.status(SUCCESS_CODE).send(card))
-    .catch((err) => {
-      if (err.name === 'NotValidId') {
+    .then((card) => {
+      if (!card) {
         res.status(NOT_FOUND_CODE).send({ message: 'Карточка с указанным _id не найдена.' });
-      } else if (err.name === 'CastError') {
+        return;
+      }
+      res.status(SUCCESS_CODE).send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
         res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные для снятия лайка.' });
-      } else res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+      } res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
     });
 };
