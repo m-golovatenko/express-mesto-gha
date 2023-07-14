@@ -2,7 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const { NOT_FOUND_CODE, PORT, DB_URL } = require('./utils/constants');
+
+const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
+const { NOT_FOUND_CODE } = require('./utils/constants');
 
 const app = express();
 
