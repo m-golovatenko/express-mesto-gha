@@ -14,7 +14,6 @@ module.exports.getUserById = (req, res) => {
   const { userId } = req.params;
 
   User.findById(userId)
-    .orFail(new Error('NotValidId'))
     .then((user) => {
       if (!user) {
         res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
