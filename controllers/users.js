@@ -31,6 +31,25 @@ module.exports.getUserById = (req, res) => {
     });
 };
 
+module.exports.getCurrentUser = (req, res) => {
+  const currentUserId = req.user._id;
+
+  User.findById(currentUserId)
+    .then((user) => {
+      if (!user) {
+        res.status(NOT_FOUND_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
+        return;
+      }
+      res.status(SUCCESS_CODE).send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(WRONG_DATA_CODE).send({ message: 'Переданы некорректные данные при поиске пользователя.' });
+      }
+      res.status(SERVER_ERROR_CODE).send({ message: 'Серверная ошибка.' });
+    });
+};
+
 module.exports.createUser = (req, res) => {
   const {
     name, about, avatar, email, password,
