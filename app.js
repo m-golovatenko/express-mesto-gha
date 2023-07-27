@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
+const auth = require('./middlewares/auth');
 
 const { login, createUser } = require('./controllers/users');
 
@@ -12,8 +13,8 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(helmet());
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+app.use('/users', auth, require('./routes/users'));
+app.use('/cards', auth, require('./routes/cards'));
 
 app.post('/signin', login);
 app.post('/signup', createUser);
