@@ -38,8 +38,9 @@ module.exports.deleteCard = (req, res, next) => {
         Card.deleteOne(card)
           .then(() => res.status(SUCCESS_CODE).send(card))
           .catch(next);
+      } else {
+        throw new ForbiddenError('Не ваша карточка.');
       }
-      throw new ForbiddenError('Не ваша карточка.');
     })
     .catch((err) => {
       if (err.name === 'CastError') {
