@@ -34,7 +34,7 @@ const validationChangeAvatar = celebrate({
 const validationCreateCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
-    link: Joi.string().uri().required().patterns(regExp),
+    link: Joi.string().uri().required().pattern(regExp),
   }),
 });
 
