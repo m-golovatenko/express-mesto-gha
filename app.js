@@ -7,7 +7,7 @@ const auth = require('./middlewares/auth');
 const { login, createUser } = require('./controllers/users');
 
 const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
-const { NOT_FOUND_CODE } = require('./utils/constants');
+const NotFoundError = require('./errors/NotFoundError');
 
 const app = express();
 
@@ -19,8 +19,21 @@ app.use('/cards', auth, require('./routes/cards'));
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-app.use('*', (req, res) => {
-  res.status(NOT_FOUND_CODE).send({ message: 'Страницы не существует' });
+app.use('*', () => {
+  throw new NotFoundError('Страницы не существует.');
+});
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'Серверная ошибка'
+        : message,
+    });
+  next();
 });
 
 mongoose
