@@ -119,9 +119,7 @@ module.exports.login = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new WrongDataError('Неправильные почта или пароль.'));
-      }
-      return next(err);
+      next(new WrongDataError('Неправильные почта или пароль.'));
+      next(err);
     });
 };
