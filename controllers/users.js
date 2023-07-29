@@ -18,15 +18,13 @@ module.exports.getUserById = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
-    .then((user) => {
-      if (!user) {
-        throw new NotFoundError('Пользователь с указанным _id не найден.');
-      }
-      res.status(SUCCESS_CODE).send(user);
+    .orFail(() => {
+      throw new NotFoundError('Пользователь с указанным _id не найден.');
     })
+    .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new WrongDataError('Переданы некорректные данные при поиске пользователя.'));
+        next(new WrongDataError('Переданы некорректные данные при поиске пользователя.'));
       }
       return next(err);
     });
