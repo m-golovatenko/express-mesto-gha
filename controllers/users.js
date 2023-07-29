@@ -26,8 +26,9 @@ module.exports.getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new WrongDataError('Переданы некорректные данные при поиске пользователя.'));
+        return;
       }
-      return next(err);
+      next(err);
     });
 };
 
@@ -43,9 +44,10 @@ module.exports.getCurrentUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new WrongDataError('Переданы некорректные данные при поиске пользователя.'));
+        next(new WrongDataError('Переданы некорректные данные при поиске пользователя.'));
+        return;
       }
-      return next(err);
+      next(err);
     });
 };
 
@@ -63,12 +65,14 @@ module.exports.createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new WrongDataError('Переданы некорректные данные при создании пользователя.'));
+        next(new WrongDataError('Переданы некорректные данные при создании пользователя.'));
+        return;
       }
       if (err.code === 11000) {
-        return next(new UserAlreadyExistError('Пользователь уже существует.'));
+        next(new UserAlreadyExistError('Пользователь уже существует.'));
+        return;
       }
-      return next(err);
+      next(err);
     });
 };
 
@@ -81,12 +85,14 @@ module.exports.changeProfile = (req, res, next) => {
     .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return next(new NotFoundError('Пользователь с указанным _id не найден.'));
+        next(new NotFoundError('Пользователь с указанным _id не найден.'));
+        return;
       }
       if (err.name === 'ValidationError') {
-        return next(new WrongDataError('Переданы некорректные данные при изменении данных пользователя.'));
+        next(new WrongDataError('Переданы некорректные данные при изменении данных пользователя.'));
+        return;
       }
-      return next(err);
+      next(err);
     });
 };
 
@@ -99,14 +105,16 @@ module.exports.changeAvatar = (req, res, next) => {
     .then((user) => res.status(SUCCESS_CODE).send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return next(new NotFoundError('Пользователь с указанным _id не найден.'));
+        next(new NotFoundError('Пользователь с указанным _id не найден.'));
+        return;
       }
 
       if (err.name === 'ValidationError') {
-        return next(new WrongDataError('ППереданы некорректные данные при изменении аватара пользователя.'));
+        next(new WrongDataError('ППереданы некорректные данные при изменении аватара пользователя.'));
+        return;
       }
 
-      return next(err);
+      next(err);
     });
 };
 

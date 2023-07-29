@@ -19,9 +19,10 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.status(SUCCESS_CREATE_CODE).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new WrongDataError('Переданы некорректные данные при создании карточки.'));
+        next(new WrongDataError('Переданы некорректные данные при создании карточки.'));
+        return;
       }
-      return next(err);
+      next(err);
     });
 };
 
@@ -44,9 +45,10 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new WrongDataError('Переданы некорректные данные карточки при удалении.'));
+        next(new WrongDataError('Переданы некорректные данные карточки при удалении.'));
+        return;
       }
-      return next(err);
+      next(err);
     });
 };
 
@@ -56,15 +58,17 @@ module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((card) => {
       if (!card) {
-        return next(new NotFoundError('Карточка с указанным _id не найдена.'));
+        next(new NotFoundError('Карточка с указанным _id не найдена.'));
+        return;
       }
-      return res.status(SUCCESS_CODE).send(card);
+      res.status(SUCCESS_CODE).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new WrongDataError('Переданы некорректные данные для постановки лайка.'));
+        next(new WrongDataError('Переданы некорректные данные для постановки лайка.'));
+        return;
       }
-      return next(err);
+      next(err);
     });
 };
 
@@ -74,14 +78,16 @@ module.exports.unlikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((card) => {
       if (!card) {
-        return next(new NotFoundError('Карточка с указанным _id не найдена.'));
+        next(new NotFoundError('Карточка с указанным _id не найдена.'));
+        return;
       }
-      return res.status(SUCCESS_CODE).send(card);
+      res.status(SUCCESS_CODE).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new WrongDataError('Переданы некорректные данные для снятия лайка.'));
+        next(new WrongDataError('Переданы некорректные данные для снятия лайка.'));
+        return;
       }
-      return next(err);
+      next(err);
     });
 };
