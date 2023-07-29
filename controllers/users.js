@@ -5,6 +5,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const WrongDataError = require('../errors/WrongDataError');
 const UserAlreadyExistError = require('../errors/UserAlreadyExistError');
+const AuthorizationError = require('../errors/AuthorizationError');
 
 const { SUCCESS_CODE, SUCCESS_CREATE_CODE } = require('../utils/constants');
 
@@ -117,7 +118,7 @@ module.exports.login = (req, res, next) => {
       });
     })
     .catch((err) => {
-      next(new WrongDataError('Неправильные почта или пароль.'));
+      next(new AuthorizationError('Такого пользователя не существует'));
       next(err);
     });
 };
